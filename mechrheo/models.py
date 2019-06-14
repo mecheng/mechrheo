@@ -7,9 +7,21 @@ class Model:
     def __init__(self):
         for fp in self._fitparams:
             setattr(self, fp, None)
+        for std_kw in self._std_fit_kw:
+            setattr(self, std_kw, None)
+        self._frequency = None
+        self._temperature = None
+        self._viscosity = None
+        self.model = ""
+        self.name = ""
+        self.date = ""
+        self.id = ""
         self.R_squared = 0.
 
     _fitparams = []
+    _md_fitparams = []
+    _std_fit_kw = ['p0', 'bounds', 'maxfev']
+    _func_str = ''
 
 
     def _kwargs(self, *args, **kwargs):
@@ -23,10 +35,15 @@ class Model:
                 values.append(getattr(self, fp))
             return dict(zip(self._fitparams, values))
 
+
 class CrossWLF(Model):
     def __init__(self):
         self._fitparams = ['tau_star', 'A_1', 'A_2', 'D_1', 'D_2', 'n']
         super(CrossWLF, self).__init__()
+        self.model = "Cross-WLF (pressure independant)"
+        self.p0 = (2.e4, 5., 1., 1.e5, 430., 0.1)
+        self.bounds = ([0., 0., 0., 200., 0., 0.], [1.e6, 1.e6, 1.e4, 2.e20, 5.e2, 1.])
+        self.maxfev = 4000
 
     def __call__(self, x, *args, **kwargs):
         T = x[0]
