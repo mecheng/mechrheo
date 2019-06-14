@@ -23,6 +23,21 @@ class Model:
     _std_fit_kw = ['p0', 'bounds', 'maxfev']
     _func_str = ''
 
+    def __repr__(self):
+        repr_str = "Material: {}\nDate: {}\nID: {}\n".format(self.name, self.date, self.id)
+        for fp in self._fitparams:
+            repr_str += "{} = {}\n".format(fp, getattr(self, fp))
+        repr_str += "R**2 = {}".format(self.R_squared)
+        return repr_str
+
+    def _repr_markdown_(self):
+        md = self._func_str
+        for fp, fpp in zip(self._fitparams, self._md_fitparams):
+            md += '{} = {}\n'.format(fpp, round(getattr(self, fp), 3))
+        md += '\n\n'
+        md += '$R^{2}='
+        md += '{}$'.format(round(self.R_squared, 4))
+        return md
 
     def _kwargs(self, *args, **kwargs):
         if len(args) == len(self._fitparams):
@@ -39,6 +54,11 @@ class Model:
 class CrossWLF(Model):
     def __init__(self):
         self._fitparams = ['tau_star', 'A_1', 'A_2', 'D_1', 'D_2', 'n']
+        self._md_fitparams = [r'$\tau^{*}$', r'$A_1$', r'$A_2$', r'$D_1$', r'$D_2$', r'$n$']
+        self._func_str = r'$\eta = \frac{\eta_0}{1+\left(\frac{\eta_0 \dot{\gamma}}{\tau^{*}}\right)^{1-n}}$'
+        self._func_str += '\n'
+        self._func_str += r'$\eta_0=e^{-\frac{A_1 (T - D_2)}{A_2 + T - D_2}}$'
+        self._func_str += '\n\n'
         super(CrossWLF, self).__init__()
         self.model = "Cross-WLF (pressure independant)"
         self.p0 = (2.e4, 5., 1., 1.e5, 430., 0.1)
