@@ -1,5 +1,5 @@
-mechmat
-=======
+mechrheo
+========
 
 .. toctree::
    :maxdepth: 4
